@@ -1,23 +1,33 @@
 from string import ascii_lowercase
 
-def main():
+def main(verbose=True):
     '''
-    >>> main()
+    >>> main(False)
     Answer for part 1: cqjxxyzz
+    <BLANKLINE>
     Answer for part 2: cqkaabcc
     '''
     current_password='cqjxjnds'
     nums = as_numbers(current_password)
+    initial_nums = nums[:]
 
+    iterations = 1
     increment(nums)
     while not valid(nums):
+        iterations += 1
         increment(nums)
     print('Answer for part 1:', from_numbers(nums))
+    if verbose:
+        print(f'(Required {iterations} iterations)')
 
+    iterations += 1
     increment(nums)
     while not valid(nums):
+        iterations += 1
         increment(nums)
-    print('Answer for part 2:', from_numbers(nums))
+    print('\nAnswer for part 2:', from_numbers(nums))
+    if verbose:
+        print(f'(Required {iterations} total iterations, which includes part 1)')
 
 def valid(password_nums):
     return (
