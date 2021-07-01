@@ -1,3 +1,8 @@
+'''
+By inspection, we notice that after enough generations, the pattern stabilizes
+and advances to the right every generation. The solution follows:
+'''
+
 import itertools
 from collections import defaultdict
 
