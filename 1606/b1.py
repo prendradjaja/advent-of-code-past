@@ -11,8 +11,9 @@ def main():
             counts[i][c] += 1
 
     for pos in sorted(counts):
-        print(max(counts[pos],
+        print(min(counts[pos],
                   key=lambda ch: counts[pos][ch]),
               end='')
+    print()
 
 main()
