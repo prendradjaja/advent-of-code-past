@@ -4,10 +4,12 @@ from util import *
 
 def main():
     numbers, n = [6,19,0,5,7,13,1], 2020-1
-    numbers, n = [0,3,6], 10-1
+    # numbers, n = [0,3,6], 10-1
 
-    for i, x in zip(range(1, n+1), game(numbers)):
-        print(f'{i}th:', x)
+    # for i, x in zip(range(1, n+2), game(numbers)):
+    #     print(f'{i}th:', x)
+
+    print(nth(game(numbers), n))
 
 def obj(**kwargs):
     result = types.SimpleNamespace()
@@ -29,9 +31,17 @@ def game(numbers):
 
     while True:
         i += 1
-        last = log[-1]
-        print(last)
-        return
+        if log[-1].prev is None:
+            n = 0
+        else:
+            n = log[-1].i - log[-1].prev
+        log.append(obj(
+            value = n,
+            prev = last_spoken.get(n, None),
+            i = i,
+        ))
+        yield n
+        last_spoken[n] = i
 
 def nth(iterable, n):
     return next(it.islice(iterable, n, n+1))
