@@ -1,4 +1,3 @@
-import sys
 import re
 import inspect
 import types
