@@ -51,7 +51,7 @@ def decompress(text):
 
     chars = list(text)
     state_name = 0
-    marker_length_string = ''
+    data_length_string = ''
     multiplier_string = ''
     output = ''
 
@@ -64,7 +64,7 @@ def decompress(text):
                 output += ch
         elif state_name == 1:
             if ch in '0123456789':
-                marker_length_string += ch
+                data_length_string += ch
             elif ch == 'x':
                 state_name = 2
             else:
@@ -74,13 +74,13 @@ def decompress(text):
                 multiplier_string += ch
             elif ch == ')':
                 state_name = 0
-                marker_length = int(marker_length_string)
+                data_length = int(data_length_string)
                 multiplier = int(multiplier_string)
-                marker_length_string = ''
+                data_length_string = ''
                 multiplier_string = ''
-                assert marker_length <= len(chars)
-                data = ''.join(chars[:marker_length])
-                chars[:marker_length] = []
+                assert data_length <= len(chars)
+                data = ''.join(chars[:data_length])
+                chars[:data_length] = []
                 output += data * multiplier
             else:
                 raise Error('Expected ) or [0-9]')
