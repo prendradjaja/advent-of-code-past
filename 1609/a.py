@@ -5,8 +5,8 @@ def main():
     f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
 
     answer = pipe(f.read().strip(), [
-        decompress,
         strip_whitespace,
+        decompress,
         len
     ])
 
