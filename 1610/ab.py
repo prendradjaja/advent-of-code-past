@@ -2,6 +2,10 @@ import collections as cl, sys
 from util import findint
 
 
+# TODO: Could be interesting to do this with an event loop instead of scanning
+# possibly all `bot_storages` every time in `find_active_bot()`
+
+
 BotRule = cl.namedtuple('BotRule', 'lo hi')
 InputRule = cl.namedtuple('InputRule', 'value target')
 
