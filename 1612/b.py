@@ -5,14 +5,14 @@ from util import ints
 def main():
     f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
     lines = [l.rstrip('\n') for l in f]
+    instructions = [ints(line.split()) for line in lines]
 
     registers = {'a': 0, 'b': 0, 'c': 1, 'd': 0}
     ip = 0
-    while ip < len(lines):
+    while ip < len(instructions):
         assert ip >= 0
-        line = lines[ip]
 
-        op, *args = ints(line.split())
+        op, *args = instructions[ip]
         offset = 1
         if op == 'cpy':
             src, dst = args
