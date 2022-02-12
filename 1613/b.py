@@ -59,6 +59,8 @@ def main():
         nonlocal nearby
         parent[node] = via
         mypathlen = pathlen(node)
+        # This is a pretty gross way of doing depth. There are simple better ways:
+        # https://stackoverflow.com/questions/31247634/how-to-keep-track-of-depth-in-breadth-first-search
         if mypathlen > 50:
             raise SearchDone()
         else:
