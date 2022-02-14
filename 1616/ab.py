@@ -1,4 +1,4 @@
-import sys
+# TODO Use progress.py
 
 
 def main():
@@ -11,6 +11,7 @@ def main():
     print('\nPart 2:')
     part_2_answer = solve(puzzle_input, part_2_disk_size, verbose=True)
     print('Part 2 answer:', part_2_answer)
+
 
 def solve(puzzle_input, disk_size, /, verbose=False):
     text = puzzle_input
