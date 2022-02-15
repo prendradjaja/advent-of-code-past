@@ -49,7 +49,7 @@ def main():
     text = text[:disk_size]
     answer = checksum(text)
     checksum_progress.done()
-    print('Answer:', str(answer)[:10] + ('...' if len(str(answer)) > 10 else ''))
+    print('Answer:', str(answer)[:20] + ('...' if len(str(answer)) > 20 else ''))
 
 
 def dragon_step(a):
