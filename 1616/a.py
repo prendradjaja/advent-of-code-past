@@ -1,30 +1,17 @@
-# TODO Use progress.py
-
-
 def main():
     puzzle_input = '11100010111110100'
-    part_1_disk_size = 272
-    part_2_disk_size = 35651584
+    disk_size = 272
 
-    print('Part 1 answer:', solve(puzzle_input, part_1_disk_size))
+    print(solve(puzzle_input, disk_size))
 
-    print('\nPart 2:')
-    part_2_answer = solve(puzzle_input, part_2_disk_size, verbose=True)
-    print('Part 2 answer:', part_2_answer)
-
-
-def solve(puzzle_input, disk_size, /, verbose=False):
+def solve(puzzle_input, disk_size):
     text = puzzle_input
 
     while len(text) < disk_size:
         text = dragon_step(text)
-        if verbose:
-            print(f'  Creating dragon. Length: {len(text):,}')
-    if verbose:
-        print('  Done creating dragon.')
 
     text = text[:disk_size]
-    return checksum(text, verbose)
+    return checksum(text)
 
 
 def dragon_step(a):
@@ -42,9 +29,7 @@ def invert(s):
     return result
 
 
-def checksum(text, /, verbose=False):
-    if verbose:
-        print(f'  Computing checksum. Length: {len(text):,}')
+def checksum(text):
     assert len(text) % 2 == 0
     result = ''
     for i in range(0, len(text), 2):
@@ -54,7 +39,7 @@ def checksum(text, /, verbose=False):
     if len(result) % 2 == 1:
         return result
     else:
-        return checksum(result, verbose=verbose)
+        return checksum(result)
 
 
 if __name__ == '__main__':
