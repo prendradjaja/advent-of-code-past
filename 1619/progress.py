@@ -41,6 +41,7 @@ class ProgressBar:
             '\r',
             bar + ' ',
             f'{value:,}/{self.total_value:,} ',
+            f'({value/self.total_value:.2%}) ',
             f'@ {timer}',
 
             end='',

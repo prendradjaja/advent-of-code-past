@@ -1,0 +1,5 @@
+Contents:
+  a.py: Part 1 solution
+  a2.py: Reworked part 1 in preparation for part 2
+  b.py: Part 2 solution
+  test_linked_list.py: Tests for LinkedList class used in a2.py and b.py
