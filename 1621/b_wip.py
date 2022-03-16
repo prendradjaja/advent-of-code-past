@@ -41,9 +41,8 @@ def main():
             start, end = args
             password = reverse_substring(password, start, end)
         elif args := sscanf(line, 'move position %u to position %u'):
-            1/0 # TODO Implement reverse_move
             src, dest = args
-            password = move_char(password, src, dest)
+            password = move_char(password, dest, src)
         else:
             1/0  # Invalid instruction
     print(''.join(password))
@@ -61,6 +60,12 @@ def move_char(s, src, dest):
     Also works on tuples and lists
     >>> move_char(tuple('abcde'), 1, 3) == tuple('acdbe')
     True
+
+    This operation is reversible
+    >>> move_char(move_char('012345', 4, 2), 2, 4)
+    '012345'
+    >>> move_char(move_char('012345', 1, 4), 4, 1)
+    '012345'
     '''
     ch = s[src]
     ch = type(s)(ch)
