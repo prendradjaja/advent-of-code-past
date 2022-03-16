@@ -4,8 +4,6 @@ import re
 
 def main():
     f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
-
-    initial_password = 'abcdefgh'
     lines = [l.rstrip('\n') for l in f]
 
     print('Part 1 answer:', scramble('abcdefgh', lines))
@@ -15,6 +13,15 @@ def main():
 def scramble(password, lines, /, unscramble=False):
     '''
     Scramble (or unscramble) a password.
+
+    >>> f = open('in')
+    >>> lines = [l.rstrip('\\n') for l in f]
+
+    >>> scramble('abcdefgh', lines)
+    'dbfgaehc'
+
+    >>> scramble('fbgdceah', lines, unscramble=True)
+    'aghfcdeb'
     '''
 
     password = list(password)
@@ -128,8 +135,13 @@ def rotate_right(s, steps):
 
 def rotate_based_on_position(password, letter):
     '''
-    >>> rotate_based_on_position('ecabd', 'd')
+    >>> rotate_based_on_position('ecabd', 'd')  # Example from problem description
     'decab'
+
+    >>> rotate_based_on_position('ecabd', 'c')
+    'bdeca'
+
+    Also works on tuples and lists (because rotate_right() does).
     '''
     index = password.index(letter)
     maybe_extra = 1 if index >= 4 else 0
@@ -138,17 +150,23 @@ def rotate_based_on_position(password, letter):
 
 def reverse_rotate_based_on_position(after, letter):
     '''
-    # >>> reverse_rotate_based_on_position('decab', 'd')
-    # 'ecabd'
+    >>> ''.join(reverse_rotate_based_on_position('bdeca', 'c'))
+    'ecabd'
+
+    It is certainly possible for there to be multiple possible solutions.
+    Luckily, in the given problem, there is not. (But in the example from the
+    problem description, there is!)
+    >>> ''.join(reverse_rotate_based_on_position('decab', 'd'))
+    Traceback (most recent call last):
+    AssertionError: Should have exactly one possible solution
     '''
     results = []
     for r in range(len(after)):
         before = rotate_right(after, r)
         if rotate_based_on_position(before, letter) == after:
             results.append(before)
-    assert len(results) == 1
-    # print('Reversed once')
-    return list(results[0])
+    assert len(results) == 1, 'Should have exactly one possible solution'
+    return results[0]
 
 
 def reverse_substring(s, start, end_inclusive):
