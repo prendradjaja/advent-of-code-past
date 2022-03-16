@@ -1,12 +1,42 @@
 import fileinput, collections, collections as cl, itertools, itertools as it, math, random, sys, re, string, functools
 
 
+def rotate_from_position(password, letter):
+    '''
+    >>> rotate_from_position('ecabd', 'd')
+    'decab'
+    '''
+    index = password.index(letter)
+    maybe_extra = 1 if index >= 4 else 0
+    return rotate_right(password, 1 + index + maybe_extra)
+
+
+def reverse_rotate_from_position(after, letter):
+    '''
+    # >>> reverse_rotate_from_position('decab', 'd')
+    # 'ecabd'
+    '''
+    results = []
+    for r in range(len(after)):
+        before = rotate_right(after, r)
+        if rotate_from_position(before, letter) == after:
+            results.append(before)
+    assert len(results) == 1
+    print('Reversed once')
+    return list(results[0])
+
+
 def main():
+    # abcdefg = 'abcdefg'
+    # for letter in abcdefg:
+    #     print(letter, rotate_from_position(abcdefg, letter))
+
     # f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
 
     f = open('rev')
     # initial_password = 'abcdefgh'
     initial_password = 'dbfgaehc'
+    initial_password = 'fbgdceah'
 
     password = list(initial_password)
     lines = [l.rstrip('\n') for l in f]
@@ -32,11 +62,11 @@ def main():
                 1/0  # Invalid rotation direction
             password = rotate_right(password, -steps)
         elif args := sscanf(line, 'rotate based on position of letter %s'):
-            1/0 # TODO Implement reverse_rotate_from_position
             (letter,) = args
-            index = password.index(letter)
-            maybe_extra = 1 if index >= 4 else 0
-            password = rotate_right(password, 1 + index + maybe_extra)
+            # index = password.index(letter)
+            # maybe_extra = 1 if index >= 4 else 0
+            # password = rotate_right(password, 1 + index + maybe_extra)
+            password = reverse_rotate_from_position(password, letter)
         elif args := sscanf(line, 'reverse positions %u through %u'):
             start, end = args
             password = reverse_substring(password, start, end)
