@@ -6,45 +6,72 @@ def main():
     f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
 
     initial_password = 'abcdefgh'
-    password = list(initial_password)
     lines = [l.rstrip('\n') for l in f]
 
+    print('Part 1 answer:', scramble('abcdefgh', lines))
+    print('Part 2 answer:', scramble('fbgdceah', lines, unscramble=True))
+
+
+def scramble(password, lines, /, unscramble=False):
+    '''
+    Scramble (or unscramble) a password.
+    '''
+
+    password = list(password)
+
+    if unscramble:
+        lines = lines[::-1]
+
     for line in lines:
-        if args := sscanf(line, 'swap position %u with position %u'):
-            i, j = args
-            password[i], password[j] = password[j], password[i]
-        elif args := sscanf(line, 'swap letter %s with letter %s'):
-            a, b = args
-            i = password.index(a)
-            j = password.index(b)
-            password[i], password[j] = password[j], password[i]
-        elif (
-            (args := sscanf(line, 'rotate %s %u steps'))
-            or (args := sscanf(line, 'rotate %s %u step'))
-        ):
-            direction, unsigned_steps = args
-            if direction == 'left':
-                steps = -unsigned_steps
-            elif direction == 'right':
-                steps = unsigned_steps
-            else:
-                1/0  # Invalid rotation direction
-            password = rotate_right(password, steps)
-        elif args := sscanf(line, 'rotate based on position of letter %s'):
-            (letter,) = args
-            index = password.index(letter)
-            maybe_extra = 1 if index >= 4 else 0
-            password = rotate_right(password, 1 + index + maybe_extra)
-        elif args := sscanf(line, 'reverse positions %u through %u'):
-            start, end = args
-            password = reverse_substring(password, start, end)
-        elif args := sscanf(line, 'move position %u to position %u'):
-            src, dest = args
+        password = execute_instruction(password, line, unscramble)
+
+    return ''.join(password)
+
+
+# This function sometimes mutates `password`
+def execute_instruction(password, line, unscramble):
+    if args := sscanf(line, 'swap position %u with position %u'):
+        i, j = args
+        password[i], password[j] = password[j], password[i]
+
+    elif args := sscanf(line, 'swap letter %s with letter %s'):
+        a, b = args
+        i = password.index(a)
+        j = password.index(b)
+        password[i], password[j] = password[j], password[i]
+
+    elif (
+        (args := sscanf(line, 'rotate %s %u steps'))
+        or (args := sscanf(line, 'rotate %s %u step'))
+    ):
+        direction, unsigned_steps = args
+        if not unscramble:
+            password = rotate_direction(password, unsigned_steps, direction)
+        else:
+            password = rotate_direction(password, -unsigned_steps, direction)
+
+    elif args := sscanf(line, 'rotate based on position of letter %s'):
+        (letter,) = args
+        if not unscramble:
+            password = rotate_based_on_position(password, letter)
+        else:
+            password = reverse_rotate_based_on_position(password, letter)
+
+    elif args := sscanf(line, 'reverse positions %u through %u'):
+        start, end = args
+        password = reverse_substring(password, start, end)
+
+    elif args := sscanf(line, 'move position %u to position %u'):
+        src, dest = args
+        if not unscramble:
             password = move_char(password, src, dest)
         else:
-            1/0  # Invalid instruction
+            password = move_char(password, dest, src)
 
-    print(''.join(password))
+    else:
+        1/0  # Invalid instruction
+
+    return password
 
 
 def move_char(s, src, dest):
@@ -64,6 +91,17 @@ def move_char(s, src, dest):
     ch = type(s)(ch)
     s = s[:src] + s[src+1:]
     return s[:dest] + ch + s[dest:]
+
+
+def rotate_direction(s, unsigned_steps, direction):
+    if direction == 'left':
+        steps = -unsigned_steps
+    elif direction == 'right':
+        steps = unsigned_steps
+    else:
+        1/0  # Invalid rotation direction
+    return rotate_right(s, steps)
+
 
 
 def rotate_right(s, steps):
@@ -86,6 +124,31 @@ def rotate_right(s, steps):
         return s[-steps:] + s[:-steps]
     else:
         return s
+
+
+def rotate_based_on_position(password, letter):
+    '''
+    >>> rotate_based_on_position('ecabd', 'd')
+    'decab'
+    '''
+    index = password.index(letter)
+    maybe_extra = 1 if index >= 4 else 0
+    return rotate_right(password, 1 + index + maybe_extra)
+
+
+def reverse_rotate_based_on_position(after, letter):
+    '''
+    # >>> reverse_rotate_based_on_position('decab', 'd')
+    # 'ecabd'
+    '''
+    results = []
+    for r in range(len(after)):
+        before = rotate_right(after, r)
+        if rotate_based_on_position(before, letter) == after:
+            results.append(before)
+    assert len(results) == 1
+    # print('Reversed once')
+    return list(results[0])
 
 
 def reverse_substring(s, start, end_inclusive):
