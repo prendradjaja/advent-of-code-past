@@ -7,21 +7,18 @@ from virtual_machine import run
 from util import strjoin, ints
 
 
-S = lambda s: document.querySelector(s)
+Q = lambda s: document.querySelector(s)
+
 
 class classes:  # css class names
     ACTIVE_HISTORY_TICK = 'active'
+
 
 def main():
     global state, history
 
     state = types.SimpleNamespace()
     state.tick = 0
-
-    # text = ''
-    # for line in open('ex'):
-    #     text += line
-    # S('.code').innerText = text
 
     instructions = [ints(l.rstrip('\n').split()) for l in open('in')]
     registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
@@ -31,13 +28,6 @@ def main():
     render_current_program_state()
 
     document.addEventListener('keydown', on_keydown)
-
-    # print('--')
-    # for each in history:
-    #     print(each)
-
-
-# ProgramState = namedtuple('ProgramState', 'instructions registers ip tick')
 
 
 def on_keydown(event):
@@ -56,16 +46,16 @@ def on_keydown(event):
 
 
 def on_select_tick(tick):
-    S('.history').children[state.tick].classList.remove(classes.ACTIVE_HISTORY_TICK)
+    Q('.history').children[state.tick].classList.remove(classes.ACTIVE_HISTORY_TICK)
     state.tick = tick
-    S('.history').children[state.tick].classList.add(classes.ACTIVE_HISTORY_TICK)
+    Q('.history').children[state.tick].classList.add(classes.ACTIVE_HISTORY_TICK)
 
     render_current_program_state()
 
 
 def render_current_program_state():
     pstate = history[state.tick]
-    S('.registers').innerText = strjoin(pstate.registers.values(), '\t')
+    Q('.registers').innerText = strjoin(pstate.registers.values(), '\t')
 
     instructions = ast.literal_eval(pstate.instructions_str)
 
@@ -73,11 +63,11 @@ def render_current_program_state():
     for i, line in enumerate(instructions + [['---']]):
         text += '* ' if i == pstate.ip else '  '
         text += f'{i:3}) {strjoin(line)}\n'
-    S('.code').innerText = text
+    Q('.code').innerText = text
 
 
 def render_history():
-    history_el = S('.history')
+    history_el = Q('.history')
     for i in range(len(history)):
         button_el = html.BUTTON(i)
         button_el.addEventListener('click',
@@ -87,8 +77,7 @@ def render_history():
         )
         history_el.appendChild(button_el)
 
-    S('.history button').classList.add(classes.ACTIVE_HISTORY_TICK)
-
+    Q('.history button').classList.add(classes.ACTIVE_HISTORY_TICK)
 
 
 if __name__ == '__main__':
