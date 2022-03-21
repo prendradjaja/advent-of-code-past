@@ -1,0 +1,9 @@
+using brython, make a time-traveling debugger with
+
+left panel: code
+right panel: history
+
+60 K steps
+200 characters per step
+
+12 M characters in memory

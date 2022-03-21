@@ -1,9 +1,13 @@
 # import fileinput, collections, collections as cl, itertools, itertools as it, math, random, sys, re, string, functools
 # from gridlib import gridsource as gridlib, gridcustom # *, gridsource, gridcardinal, gridplane
-# from util import *
 
+from collections import namedtuple
+from util import *
+from copy import deepcopy, copy
+
+import os
 import sys
-from util import ints
+# from util import ints
 
 
 def main():
@@ -22,21 +26,56 @@ def main():
     # print('Day 12 part 2:', registers['a'])
     # assert registers['a'] == 9227661
 
-    instructions = [ints(l.rstrip('\n').split()) for l in open('ex')]
-    registers = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
-    run(instructions, registers)
-    print('Example:      ', registers['a'])
-    assert registers['a'] == 3
+    # instructions = [ints(l.rstrip('\n').split()) for l in open('ex')]
+    # registers = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
+    # history = run(instructions, registers, record_history=True)
+    # for each in history:
+    #     print(each)
+    #     print()
 
     instructions = [ints(l.rstrip('\n').split()) for l in open('in')]
     registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
-    run(instructions, registers)
+    debug = False
+    debug = True
+    run(instructions, registers, debug=False, record_history=True)
     print('Part 1:       ', registers['a'])
     assert registers['a'] == 13776
 
 
 
-def run(instructions, registers):
+def show_state(
+    instructions,
+    registers,
+    ip  # Index of the instruction about to be executed
+):
+    os.system('clear')
+    print(*registers.keys(), sep='\t')
+    print(*registers.values(), sep='\t')
+
+    print()
+
+    for i, instruction in enumerate(instructions + [['---']]):
+        print('*' if i == ip else ' ', f'{i:2})', strjoin(instruction))
+
+
+ProgramState = namedtuple('ProgramState', 'instructions_str registers ip tick')
+
+def save_state(instructions, registers, ip, history):
+    instructions_str = repr(instructions)
+    # registers = dict(registers)
+    registers = copy(registers)
+    history.append(
+        ProgramState(
+            instructions_str=instructions_str,
+            registers=registers,
+            ip=ip,
+            tick=len(history)
+        )
+    )
+    # print('appending', history)
+
+
+def run(instructions, registers, /, debug=False, record_history=False):
     '''
     Warning: Mutates `instructions` AND `registers`!
 
@@ -44,7 +83,16 @@ def run(instructions, registers):
     '''
     n = 0
     ip = 0
-    while ip < len(instructions):
+
+    if debug:
+        show_state(instructions, registers, ip)
+        input()
+
+    if record_history:
+        history = []
+        save_state(instructions, registers, ip, history)
+
+    while ip < len(instructions) and n < 100:
         assert ip >= 0
 
         op, *args = instructions[ip]
@@ -112,6 +160,22 @@ def run(instructions, registers):
         # print()
 
         ip += offset
+
+        n += 1
+        # print(n, *registers.values(), sep='\t')
+
+        if debug:
+            show_state(instructions, registers, ip)
+            input()
+
+        if record_history:
+            save_state(instructions, registers, ip, history)
+
+    if record_history:
+        # print(history)
+        return history
+
+
 
 
 class NotARegisterException(Exception):

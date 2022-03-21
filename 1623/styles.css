@@ -1,0 +1,48 @@
+.main-container {
+  border: 2px solid black;
+  height: 500px;
+  display: flex;
+}
+
+.left-panel {
+  height: 100%;
+  flex: 0 0 50%;
+}
+
+.right-panel {
+  border-left: 2px solid #ccc;
+  height: 100%;
+  flex: 0 0 50%;
+}
+
+.history {
+  overflow-y: scroll;
+  height: 100%;
+  font-family: monospace;
+}
+
+.history button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: monospace;
+}
+
+.history button.active {
+  color: red;
+  opacity: 0.2;
+  font-weight: bold;
+}
+
+.register-names {
+  color: #ccc;
+}
+
+pre {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.registers {
+  margin-bottom: 1em;
+}
