@@ -7,7 +7,8 @@ from virtual_machine import run
 from util import strjoin, ints
 
 
-Q = lambda s: document.querySelector(s)
+# In js, i need to do Q = s => document.querySelector(s). I guess this is because Python binds methods at the dot, and JS binds at call time
+Q = document.querySelector
 
 
 class classes:  # css class names
@@ -28,21 +29,6 @@ def main():
     render_current_program_state()
 
     document.addEventListener('keydown', on_keydown)
-
-
-def on_keydown(event):
-    if event.key == 'ArrowLeft':
-        new_tick = max(state.tick - 1, 0)
-        on_select_tick(new_tick)
-    elif event.key == 'ArrowRight':
-        new_tick = min(state.tick + 1, len(history) - 1)
-        on_select_tick(new_tick)
-    elif event.key == 'ArrowUp':
-        event.preventDefault()
-        on_select_tick(0)
-    elif event.key == 'ArrowDown':
-        event.preventDefault()
-        on_select_tick(len(history) - 1)
 
 
 def on_select_tick(tick):
@@ -78,6 +64,21 @@ def render_history():
         history_el.appendChild(button_el)
 
     Q('.history button').classList.add(classes.ACTIVE_HISTORY_TICK)
+
+
+def on_keydown(event):
+    if event.key == 'ArrowLeft':
+        new_tick = max(state.tick - 1, 0)
+        on_select_tick(new_tick)
+    elif event.key == 'ArrowRight':
+        new_tick = min(state.tick + 1, len(history) - 1)
+        on_select_tick(new_tick)
+    elif event.key == 'ArrowUp':
+        event.preventDefault()
+        on_select_tick(0)
+    elif event.key == 'ArrowDown':
+        event.preventDefault()
+        on_select_tick(len(history) - 1)
 
 
 if __name__ == '__main__':
