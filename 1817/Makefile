@@ -11,14 +11,16 @@
 SHELL=/bin/bash
 
 run:
+	@clear
 	@python3 s.py
 
 test:
 	clear
-	python3 -m doctest s.py
+	python3 -m doctest test_tick.txt
 
 copy-last:
 	python3 s.py | tee >(tail -n1 | pbcopy)
 
 example:
+	@clear
 	@python3 s.py ex

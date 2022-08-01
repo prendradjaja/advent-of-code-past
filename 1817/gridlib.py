@@ -37,8 +37,11 @@ def _make_grid_library(names, rotdir):
             return clazz.move(pos, direction, 1)
 
         @staticmethod
-        def addvec(a, b):
-            return tuple(x+y for x,y in zip(a,b))
+        def addvec(a, b, c=None):
+            if not c:
+                return tuple(x+y for x,y in zip(a,b))
+            else:
+                return clazz.addvec(a, clazz.addvec(b, c))
 
         @staticmethod
         def subvec(a, b):
