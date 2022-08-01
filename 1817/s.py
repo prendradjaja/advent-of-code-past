@@ -3,6 +3,7 @@ from gridlib import gridsource as gridlib, gridcustom # *, gridsource, gridcardi
 from util import *
 
 from termcolor import colored
+import os
 
 
 DOWN = (0, 1)
@@ -23,7 +24,15 @@ def main():
     grid = parse_input_file(input_path)
     grid[(500, 0)] = '+'
 
-    xs = [x for (x, y) in grid]
+
+    frontier = [(500, 0)]
+
+    # while True:
+    #     tick(grid, 13, frontier)
+    #     show(grid, 494, 507, 0, 15, color=True)
+    #     input()
+    #     os.system('clear')
+
     ys = [y for (x, y) in grid]
     # print(min(xs), max(xs))
     # print(min(ys), max(ys))
@@ -42,7 +51,7 @@ def main():
     ticks = 0
     while True:
         ticks += 1
-        tick(grid, ylimit)
+        tick(grid, ylimit, frontier)
         waters = count(grid)
         if ticks % 10 == 0:
             print(ticks, f'{waters:,}')
@@ -55,21 +64,6 @@ def main():
 
     print(waters)
 
-    # for _ in range(2):
-    #     tick(grid, max(ys))
-    #     show(grid, 494, 507, 0, 13)
-
-    # tick(grid, max(ys))
-    # show(grid, 494, 507, 0, 13)
-    #
-    # tick(grid, max(ys))
-    # show(grid, 494, 507, 0, 13)
-    #
-    # tick(grid, max(ys))
-    # show(grid, 494, 507, 0, 13)
-    #
-    # tick(grid, max(ys))
-    # show(grid, 494, 507, 0, 13)
 
 def get(d, key):
     '''
@@ -83,70 +77,78 @@ def get(d, key):
         return d.default_factory()
 
 
-def tick(grid, ylimit):
-    # Drop phase
-    to_drop = []
-    to_spread_from = []
-    for pos, value in grid.items():
+def tick(grid, ylimit, frontier):
+    new_frontier = []
+    for pos in frontier:
+        # assert get(grid, pos) in '|+'
+        if not get(grid, pos) in '|+':
+            continue
+
+        value = get(grid, pos)
         below_pos = gridlib.addvec(pos, DOWN)
         below_value = get(grid, below_pos)
-        if value in '+|' and below_value == ',':
-            to_drop.append(below_pos)
-        elif (
-            value in '+|'
-            and below_value in '#~'
-            and (
-                get(grid, gridlib.addvec(pos, LEFT)) == ','
-                or get(grid, gridlib.addvec(pos, RIGHT)) == ','
-            )
-        ):
-            to_spread_from.append(pos)
-    for pos in to_drop:
-        x, y = pos
-        if y <= ylimit:
-            grid[pos] = '|'
+        if below_value == ',':
+            if below_pos[1] <= ylimit:
+                grid[below_pos] = '|'
+                new_frontier.append(below_pos)
+        else:
+            left_pos = gridlib.addvec(pos, LEFT)
+            left_value = get(grid, left_pos)
+            right_pos = gridlib.addvec(pos, RIGHT)
+            right_value = get(grid, right_pos)
+            if left_value == ',':
+                grid[left_pos] = '|'
+            if right_value == ',':
+                grid[right_pos] = '|'
+            settled, climbs = maybe_settle(grid, pos)
+            if not settled:
+                if left_value == ',':
+                    new_frontier.append(left_pos)
+                if right_value == ',':
+                    new_frontier.append(right_pos)
+            if settled:
+                new_frontier.extend(climbs)
 
-    # Spread phase
-    for pos in to_spread_from:
-        spread(grid, pos)
+    frontier[:] = new_frontier
 
 
-def spread(grid, origin):
+def maybe_settle(grid, origin):
+    assert get(grid, origin) == '|'
+
     left_edge = origin
     pos = origin
-    while (
-        grid[pos] != '#' and
-        grid[(below := gridlib.addvec(pos, DOWN))] in '~#'
-    ):
-        left_edge = pos
+    while get(grid, pos) == '|':
         pos = gridlib.addvec(pos, LEFT)
+    left_edge = pos
 
     right_edge = origin
     pos = origin
-    while (
-        grid[pos] != '#' and
-        grid[(below := gridlib.addvec(pos, DOWN))] in '~#'
-    ):
-        right_edge = pos
+    while get(grid, pos) == '|':
         pos = gridlib.addvec(pos, RIGHT)
+    right_edge = pos
 
-    char = '~'
-    if (
-        grid[gridlib.addvec(left_edge, LEFT)] == ',' and
-        grid[gridlib.addvec(left_edge, LEFT, DOWN)] == ','
-    ):
-        char = '|'
-        grid[gridlib.addvec(left_edge, LEFT)] = '|'
-
-    if (
-        grid[gridlib.addvec(right_edge, RIGHT)] == ',' and
-        grid[gridlib.addvec(right_edge, RIGHT, DOWN)] == ','
-    ):
-        char = '|'
-        grid[gridlib.addvec(right_edge, RIGHT)] = '|'
-
+    segment = ''
     for x in range(left_edge[0], right_edge[0]+1):
-        grid[(x, origin[1])] = char
+        y = origin[1]
+        segment += get(grid, (x, y))
+
+    middle = segment[1:-1]
+    is_shut_in = segment[0] == segment[-1] == '#'
+
+    climbs = None
+
+    if is_shut_in:
+        for x in range(left_edge[0]+1, right_edge[0]):
+            y = origin[1]
+            grid[(x, y)] = '~'
+        climbs = []
+        for x in range(left_edge[0]+1, right_edge[0]):
+            y = origin[1] - 1
+            if get(grid, (x, y)) == '|':
+                climbs.append((x, y))
+
+    return is_shut_in, climbs
+
 
 
 def parse_input_file(path):
