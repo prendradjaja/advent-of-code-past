@@ -110,8 +110,6 @@ def tick(grid, ylimit):
     for pos in to_spread_from:
         spread(grid, pos)
 
-    return bool(to_drop or to_spread_from)
-
 
 def spread(grid, origin):
     left_edge = origin
