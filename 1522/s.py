@@ -33,6 +33,9 @@ SPELL_DURATIONS = {
 }
 assert list(SPELL_DURATIONS) == SPELLS
 
+# How much armor Shield adds
+SHIELD_AMOUNT = 7
+
 
 def log(*args, **kwargs):
     print(*args, **kwargs)
@@ -40,24 +43,30 @@ def log(*args, **kwargs):
 
 
 def main():
-    # Example 1
+    # # Example 1
+    # game = Game(
+    #     boss_hp = 13,
+    #     boss_damage = 8,
+    #     player_hp = 10,
+    #     player_mana = 250,
+    # )
+    # game.player_turn(POISON)
+    # game.boss_turn()
+    # game.player_turn(MAGIC_MISSILE)
+    # game.boss_turn()
+
+    # Example 2
     game = Game(
-        boss_hp = 13,
+        boss_hp = 14,
         boss_damage = 8,
         player_hp = 10,
         player_mana = 250,
     )
-    # boss = Fighter(13, 8, _, _)
-    # player = Fighter(10, _, _, 250)
-
-    # # Puzzle input
-    # boss = Fighter(55, 8, _, _)  # TODO add kwargs support to Record constructor
-    # player = Fighter(50, _, _, 500)
-
-    game.player_turn(POISON)
+    game.player_turn(RECHARGE)
     game.boss_turn()
-    game.player_turn(MAGIC_MISSILE)
+    game.player_turn(SHIELD)
     game.boss_turn()
+
 
 
 class Game:
@@ -122,18 +131,24 @@ class Game:
         effect.timer -= 1
 
         if effect.name == SHIELD:
-            pass  # TODO
+            log(f"{effect.name}'s timer is now {effect.timer}.")
         elif effect.name == POISON:
             damage = 3
             self.boss.hp -= damage
             log(f'{effect.name} deals {damage} damage; its timer is now {effect.timer}.')
         elif effect.name == RECHARGE:
-            pass  # TODO
+            amount = 101
+            self.player.mana += amount
+            log(f'{effect.name} provides {amount} mana; its timer is now {effect.timer}.')
         else:
             1/0
 
         if effect.timer <= 0:
-            log(f'{effect.name} wears off.')
+            if effect.name != SHIELD:
+                log(f'{effect.name} wears off.')
+            else:
+                self.player.armor -= SHIELD_AMOUNT
+                log(f'{effect.name} wears off, decreasing armor by {SHIELD_AMOUNT}.')
             return True
         else:
             return False
@@ -164,13 +179,15 @@ class Game:
         elif spell == DRAIN:
             pass  # TODO
         elif spell == SHIELD:
-            pass  # TODO
+            self.player.armor += SHIELD_AMOUNT
+            self.active_effects.append(Effect(spell, SPELL_DURATIONS[spell]))
+            log(f'Player casts {spell}, increasing armor by {SHIELD_AMOUNT}.')
         elif spell == POISON:
             self.active_effects.append(Effect(spell, SPELL_DURATIONS[spell]))
             log(f'Player casts {spell}.')
-            pass  # TODO
         elif spell == RECHARGE:
-            pass  # TODO
+            self.active_effects.append(Effect(spell, SPELL_DURATIONS[spell]))
+            log(f'Player casts {spell}.')
         else:
             1/0
 
