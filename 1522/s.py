@@ -34,146 +34,165 @@ SPELL_DURATIONS = {
 assert list(SPELL_DURATIONS) == SPELLS
 
 
-# turn phases:
-# - show stats
-# - handle effects
-# - check gameover
-# - attack/spell
-# - check gameover
+def log(*args, **kwargs):
+    print(*args, **kwargs)
+    pass
 
 
 def main():
-    global boss, player
-    global active_effects
-
-    active_effects = []
-
-    _ = 0
-
     # Example 1
-    boss = Fighter(13, 8, _, _)
-    player = Fighter(10, _, _, 250)
+    game = Game(
+        boss_hp = 13,
+        boss_damage = 8,
+        player_hp = 10,
+        player_mana = 250,
+    )
+    # boss = Fighter(13, 8, _, _)
+    # player = Fighter(10, _, _, 250)
 
     # # Puzzle input
     # boss = Fighter(55, 8, _, _)  # TODO add kwargs support to Record constructor
     # player = Fighter(50, _, _, 500)
 
-    player_turn(POISON)
-    boss_turn()
-    player_turn(MAGIC_MISSILE)
-    boss_turn()
+    game.player_turn(POISON)
+    game.boss_turn()
+    game.player_turn(MAGIC_MISSILE)
+    game.boss_turn()
 
 
-def player_turn(spell):
-    assert spell in SPELLS
-
-    log('-- Player turn --')
-    log_stats()
-    handle_effects()
-    check_gameover()
-    cast_spell(spell)
-    check_gameover()
-    log()
+class Game:
+    def __init__(self, *, boss_hp, boss_damage, player_hp, player_mana):
+        self.boss = Fighter(boss_hp, boss_damage, 0, 0)
+        self.player = Fighter(player_hp, 0, 0, player_mana)
+        self.active_effects = []
+        self.is_game_over = False
 
 
-def boss_turn():
-    log('-- Boss turn --')
-    log_stats()
-    handle_effects()
-    check_gameover()
-    boss_attack()
-    check_gameover()
-    log()
+    def player_turn(self, spell):
+        assert not self.is_game_over
+        assert spell in SPELLS
+
+        log('-- Player turn --')
+        self.log_stats()
+
+        try:
+            self.handle_effects()
+            self.check_gameover()
+
+            self.cast_spell(spell)
+            self.check_gameover()
+        except GameOver:
+            pass
+
+        log('')
 
 
-def handle_effects():
-    to_remove = []
-    for effect in active_effects:
-        expired = handle_effect(effect)
-        if expired:
-            to_remove.append(effect)
+    def boss_turn(self):
+        assert not self.is_game_over
+        log('-- Boss turn --')
+        self.log_stats()
 
-    for effect in to_remove:
-        active_effects.remove(effect)
+        try:
+            self.handle_effects()
+            self.check_gameover()
 
+            self.boss_attack()
+            self.check_gameover()
+        except GameOver:
+            pass
 
-def handle_effect(effect):
-    '''
-    Returns True if (and only if) the effect has now worn off.
-    '''
-    effect.timer -= 1
-
-    if effect.name == SHIELD:
-        pass  # TODO
-    elif effect.name == POISON:
-        damage = 3
-        boss.hp -= damage
-        log(f'{effect.name} deals {damage} damage; its timer is now {effect.timer}.')
-    elif effect.name == RECHARGE:
-        pass  # TODO
-    else:
-        1/0
-
-    if effect.timer <= 0:
-        log(f'{effect.name} wears off.')
-        return True
-    else:
-        return False
+        log('')
 
 
-def boss_attack():
-    if player.armor:
-        damage = max(boss.damage - player.armor, 1)
-        log(f'Boss attacks for {boss.damage} - {player.armor} = {damage} damage!')
-    else:
-        damage = boss.damage
-        log(f'Boss attacks for {damage} damage!')
-    player.hp -= damage
+    def handle_effects(self):
+        to_remove = []
+        for effect in self.active_effects:
+            expired = self.handle_effect(effect)
+            if expired:
+                to_remove.append(effect)
+
+        for effect in to_remove:
+            self.active_effects.remove(effect)
 
 
-def cast_spell(spell):
-    assert spell in SPELLS
+    def handle_effect(self, effect):
+        '''
+        Returns True if (and only if) the effect has now worn off.
+        '''
+        effect.timer -= 1
 
-    spell_cost = SPELL_COSTS[spell]
-    assert player.mana >= spell_cost, 'TODO handle this case?'
-    player.mana -= spell_cost
+        if effect.name == SHIELD:
+            pass  # TODO
+        elif effect.name == POISON:
+            damage = 3
+            self.boss.hp -= damage
+            log(f'{effect.name} deals {damage} damage; its timer is now {effect.timer}.')
+        elif effect.name == RECHARGE:
+            pass  # TODO
+        else:
+            1/0
 
-    if spell == MAGIC_MISSILE:
-        damage = 4
-        boss.hp -= damage
-        log(f'Player casts {spell}, dealing {damage} damage.')
-        pass  # TODO
-    elif spell == DRAIN:
-        pass  # TODO
-    elif spell == SHIELD:
-        pass  # TODO
-    elif spell == POISON:
-        active_effects.append(Effect(spell, SPELL_DURATIONS[spell]))
-        log(f'Player casts {spell}.')
-        pass  # TODO
-    elif spell == RECHARGE:
-        pass  # TODO
-    else:
-        1/0
+        if effect.timer <= 0:
+            log(f'{effect.name} wears off.')
+            return True
+        else:
+            return False
 
 
-def check_gameover():
-    if player.hp <= 0:
-        print('The player dies.')
-        exit()  # TODO?
-    elif boss.hp <= 0:
-        print('The boss dies.')
-        exit()  # TODO?
+    def boss_attack(self):
+        if self.player.armor:
+            damage = max(self.boss.damage - self.player.armor, 1)
+            log(f'Boss attacks for {self.boss.damage} - {self.player.armor} = {damage} damage!')
+        else:
+            damage = self.boss.damage
+            log(f'Boss attacks for {damage} damage!')
+        self.player.hp -= damage
 
 
-def log_stats():
-    log(f'- Player has {player.hp} hit points, {player.armor} armor, ' +
-        f'{player.mana} mana')
-    log(f'- Boss has {boss.hp} hit points')
+    def cast_spell(self, spell):
+        assert spell in SPELLS
+
+        spell_cost = SPELL_COSTS[spell]
+        assert self.player.mana >= spell_cost, 'TODO handle this case?'
+        self.player.mana -= spell_cost
+
+        if spell == MAGIC_MISSILE:
+            damage = 4
+            self.boss.hp -= damage
+            log(f'Player casts {spell}, dealing {damage} damage.')
+            pass  # TODO
+        elif spell == DRAIN:
+            pass  # TODO
+        elif spell == SHIELD:
+            pass  # TODO
+        elif spell == POISON:
+            self.active_effects.append(Effect(spell, SPELL_DURATIONS[spell]))
+            log(f'Player casts {spell}.')
+            pass  # TODO
+        elif spell == RECHARGE:
+            pass  # TODO
+        else:
+            1/0
 
 
-def log(*args, **kwargs):
-    print(*args, **kwargs)
+    def check_gameover(self):
+        if self.player.hp <= 0:
+            print('The player dies.')
+            self.is_game_over = True
+            raise GameOver()
+        elif self.boss.hp <= 0:
+            print('The boss dies.')
+            self.is_game_over = True
+            raise GameOver()
+
+
+    def log_stats(self):
+        log(f'- Player has {self.player.hp} hit points, {self.player.armor} armor, ' +
+            f'{self.player.mana} mana')
+        log(f'- Boss has {self.boss.hp} hit points')
+
+
+class GameOver(Exception):
     pass
 
 

@@ -1,0 +1,37 @@
+>>> from s import Game, POISON, MAGIC_MISSILE
+>>> game = Game(
+...     boss_hp = 13,
+...     boss_damage = 8,
+...     player_hp = 10,
+...     player_mana = 250,
+... )
+>>> game.player_turn(POISON)
+-- Player turn --
+- Player has 10 hit points, 0 armor, 250 mana
+- Boss has 13 hit points
+Player casts Poison.
+<BLANKLINE>
+
+>>> game.boss_turn()
+-- Boss turn --
+- Player has 10 hit points, 0 armor, 77 mana
+- Boss has 13 hit points
+Poison deals 3 damage; its timer is now 5.
+Boss attacks for 8 damage!
+<BLANKLINE>
+
+>>> game.player_turn(MAGIC_MISSILE)
+-- Player turn --
+- Player has 2 hit points, 0 armor, 77 mana
+- Boss has 10 hit points
+Poison deals 3 damage; its timer is now 4.
+Player casts Magic Missile, dealing 4 damage.
+<BLANKLINE>
+
+>>> game.boss_turn()
+-- Boss turn --
+- Player has 2 hit points, 0 armor, 24 mana
+- Boss has 3 hit points
+Poison deals 3 damage; its timer is now 3.
+The boss dies.
+<BLANKLINE>
