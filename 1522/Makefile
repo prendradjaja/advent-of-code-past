@@ -17,6 +17,7 @@ run:
 test:
 	clear
 	python3 -m doctest -f example_1.txt
+	python3 -m doctest -f example_2.txt
 	python3 -m doctest s.py
 
 copy-last:

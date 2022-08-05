@@ -66,6 +66,12 @@ def main():
     game.boss_turn()
     game.player_turn(SHIELD)
     game.boss_turn()
+    game.player_turn(DRAIN)
+    game.boss_turn()
+    game.player_turn(POISON)
+    game.boss_turn()
+    game.player_turn(MAGIC_MISSILE)
+    game.boss_turn()
 
 
 
@@ -175,9 +181,11 @@ class Game:
             damage = 4
             self.boss.hp -= damage
             log(f'Player casts {spell}, dealing {damage} damage.')
-            pass  # TODO
         elif spell == DRAIN:
-            pass  # TODO
+            amount = 2
+            self.boss.hp -= amount
+            self.player.hp += amount
+            log(f'Player casts {spell}, dealing {amount} damage, and healing {amount} hit points.')
         elif spell == SHIELD:
             self.player.armor += SHIELD_AMOUNT
             self.active_effects.append(Effect(spell, SPELL_DURATIONS[spell]))
