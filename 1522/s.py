@@ -55,23 +55,76 @@ def main():
     # game.player_turn(MAGIC_MISSILE)
     # game.boss_turn()
 
-    # Example 2
+    # # Example 2
+    # game = Game(
+    #     boss_hp = 14,
+    #     boss_damage = 8,
+    #     player_hp = 10,
+    #     player_mana = 250,
+    # )
+    # game.player_turn(RECHARGE)
+    # game.boss_turn()
+    # game.player_turn(SHIELD)
+    # game.boss_turn()
+    # game.player_turn(DRAIN)
+    # game.boss_turn()
+    # game.player_turn(POISON)
+    # game.boss_turn()
+    # game.player_turn(MAGIC_MISSILE)
+    # game.boss_turn()
+
+    # Puzzle input
     game = Game(
-        boss_hp = 14,
+        boss_hp = 55,
         boss_damage = 8,
-        player_hp = 10,
-        player_mana = 250,
+        player_hp = 50,
+        player_mana = 500,
     )
-    game.player_turn(RECHARGE)
-    game.boss_turn()
-    game.player_turn(SHIELD)
-    game.boss_turn()
-    game.player_turn(DRAIN)
-    game.boss_turn()
+
+    # # 1362
+    # game.player_turn(POISON)
+    # game.player_turn(RECHARGE)
+    # game.player_turn(SHIELD)
+    # game.player_turn(MAGIC_MISSILE)
+    #
+    # game.player_turn(POISON)
+    # game.player_turn(RECHARGE)
+    # game.player_turn(SHIELD)
+    # game.player_turn(MAGIC_MISSILE)
+    #
+    # game.player_turn(POISON)
+    # game.player_turn(MAGIC_MISSILE)
+    #
+    # game.log_stats()
+
+
+    # # 953
+    # game.player_turn(POISON)
+    # game.player_turn(RECHARGE)
+    # game.player_turn(SHIELD)
+    # game.player_turn(MAGIC_MISSILE)
+    #
+    # game.player_turn(POISON)
+    # game.player_turn(MAGIC_MISSILE)
+    # game.player_turn(MAGIC_MISSILE)
+    # game.player_turn(MAGIC_MISSILE)
+    # game.player_turn(MAGIC_MISSILE)
+    #
+    # game.log_stats()
+
+    # 953
     game.player_turn(POISON)
-    game.boss_turn()
+    game.player_turn(RECHARGE)
+    game.player_turn(SHIELD)
     game.player_turn(MAGIC_MISSILE)
-    game.boss_turn()
+
+    game.player_turn(POISON)
+    game.player_turn(MAGIC_MISSILE)
+    game.player_turn(MAGIC_MISSILE)
+    game.player_turn(MAGIC_MISSILE)
+    game.player_turn(MAGIC_MISSILE)
+
+    game.log_stats()
 
 
 
@@ -81,6 +134,7 @@ class Game:
         self.player = Fighter(player_hp, 0, 0, player_mana)
         self.active_effects = []
         self.is_game_over = False
+        self.total_mana_spent = 0
 
 
     def player_turn(self, spell):
@@ -100,6 +154,8 @@ class Game:
             pass
 
         log('')
+        # if not self.is_game_over:
+        #     self.boss_turn()
 
 
     def boss_turn(self):
@@ -176,6 +232,7 @@ class Game:
         spell_cost = SPELL_COSTS[spell]
         assert self.player.mana >= spell_cost, 'TODO handle this case?'
         self.player.mana -= spell_cost
+        self.total_mana_spent += spell_cost
 
         if spell == MAGIC_MISSILE:
             damage = 4
@@ -207,6 +264,7 @@ class Game:
             raise GameOver()
         elif self.boss.hp <= 0:
             print('The boss dies.')
+            # print('The boss dies. ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅')
             self.is_game_over = True
             raise GameOver()
 
@@ -215,6 +273,7 @@ class Game:
         log(f'- Player has {self.player.hp} hit points, {self.player.armor} armor, ' +
             f'{self.player.mana} mana')
         log(f'- Boss has {self.boss.hp} hit points')
+        # log(f'- Total mana spent: {self.total_mana_spent}')
 
 
 class GameOver(Exception):
