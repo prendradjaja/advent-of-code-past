@@ -38,7 +38,7 @@ SHIELD_AMOUNT = 7
 
 
 def log(*args, **kwargs):
-    # return
+    return
     print(*args, **kwargs)
     pass
 
@@ -58,16 +58,29 @@ def main():
     #
     # game.log_stats()
 
-    # dfs((), 954, set())
-    # dfs((), 953, set())
-    # dfs((), 907, set())
-    # dfs((), 855, set())
+    # dfs((), 2000, set())
+    dfs((), 1289, set())
 
-    # This is the strategy that my search found, with mana cost 854 (too low). I can see why it's wrong -- poison was cast while it was still active
-    game = make_game()
-    for spell in ('Poison', 'Recharge', 'Poison', 'Poison', 'Magic Missile', 'Magic Missile'):
-        game.player_turn(spell)
-        game.boss_turn()
+    # # This is the strategy that my search found, with mana cost 854 (too low). I can see why it's wrong -- poison was cast while it was still active
+    # game = make_game()
+    # for spell in ('Poison', 'Recharge', 'Poison', 'Poison', 'Magic Missile', 'Magic Missile'):
+    #     game.player_turn(spell)
+    #     game.boss_turn()
+
+    # game = make_game()
+    # game.player_turn(POISON)
+    # game.boss_turn()
+    # # print(find(game.active_effects, lambda effect: effect.name == POISON))
+
+
+def find(lst, pred):
+    matches = [x for x in lst if pred(x)]
+    assert len(matches) <= 1
+    if matches:
+        return matches[0]
+    else:
+        return None
+
 
 
 
@@ -105,7 +118,22 @@ def neighbors(strategy):
         strategy + (spell,)
         for spell in SPELLS
         if SPELL_COSTS[spell] <= game.player.mana
+            and will_not_have_active_effect(game, spell)
     ]
+
+
+def will_not_have_active_effect(game, spell):
+    effect = find(game.active_effects, lambda effect: effect.name == spell)
+    if not effect:
+        return True
+    else:
+        if effect.timer == 1:
+            return True
+        else:
+            return False
+
+
+
 
 
 def mana_spent(strategy):
@@ -156,6 +184,9 @@ class Game:
         self.log_stats()
 
         try:
+            self.player.hp -= 1
+            self.check_gameover()
+
             self.handle_effects()
             self.check_gameover()
 
