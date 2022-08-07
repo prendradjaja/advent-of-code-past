@@ -38,66 +38,12 @@ SHIELD_AMOUNT = 7
 
 
 def log(*args, **kwargs):
+    # return
     print(*args, **kwargs)
     pass
 
 
 def main():
-    # # Example 1
-    # game = Game(
-    #     boss_hp = 13,
-    #     boss_damage = 8,
-    #     player_hp = 10,
-    #     player_mana = 250,
-    # )
-    # game.player_turn(POISON)
-    # game.boss_turn()
-    # game.player_turn(MAGIC_MISSILE)
-    # game.boss_turn()
-
-    # # Example 2
-    # game = Game(
-    #     boss_hp = 14,
-    #     boss_damage = 8,
-    #     player_hp = 10,
-    #     player_mana = 250,
-    # )
-    # game.player_turn(RECHARGE)
-    # game.boss_turn()
-    # game.player_turn(SHIELD)
-    # game.boss_turn()
-    # game.player_turn(DRAIN)
-    # game.boss_turn()
-    # game.player_turn(POISON)
-    # game.boss_turn()
-    # game.player_turn(MAGIC_MISSILE)
-    # game.boss_turn()
-
-    # Puzzle input
-    game = Game(
-        boss_hp = 55,
-        boss_damage = 8,
-        player_hp = 50,
-        player_mana = 500,
-    )
-
-    # # 1362
-    # game.player_turn(POISON)
-    # game.player_turn(RECHARGE)
-    # game.player_turn(SHIELD)
-    # game.player_turn(MAGIC_MISSILE)
-    #
-    # game.player_turn(POISON)
-    # game.player_turn(RECHARGE)
-    # game.player_turn(SHIELD)
-    # game.player_turn(MAGIC_MISSILE)
-    #
-    # game.player_turn(POISON)
-    # game.player_turn(MAGIC_MISSILE)
-    #
-    # game.log_stats()
-
-
     # # 953
     # game.player_turn(POISON)
     # game.player_turn(RECHARGE)
@@ -112,20 +58,84 @@ def main():
     #
     # game.log_stats()
 
-    # 953
-    game.player_turn(POISON)
-    game.player_turn(RECHARGE)
-    game.player_turn(SHIELD)
-    game.player_turn(MAGIC_MISSILE)
+    # dfs((), 954, set())
+    # dfs((), 953, set())
+    # dfs((), 907, set())
+    # dfs((), 855, set())
 
-    game.player_turn(POISON)
-    game.player_turn(MAGIC_MISSILE)
-    game.player_turn(MAGIC_MISSILE)
-    game.player_turn(MAGIC_MISSILE)
-    game.player_turn(MAGIC_MISSILE)
+    # This is the strategy that my search found, with mana cost 854 (too low). I can see why it's wrong -- poison was cast while it was still active
+    game = make_game()
+    for spell in ('Poison', 'Recharge', 'Poison', 'Poison', 'Magic Missile', 'Magic Missile'):
+        game.player_turn(spell)
+        game.boss_turn()
 
-    game.log_stats()
 
+
+# (first set every visited flag to false)
+nodes = 0
+def dfs(u, target, visited):
+    global nodes
+    nodes += 1
+
+    if nodes % 10000 == 0:
+        print(f'... {nodes:,}')
+
+    if mana_spent(u) >= target:
+        return
+
+    game_result = evaluate_node(u)
+    if game_result == LOSS:
+        return
+    elif game_result == WIN:
+        print(f'Win found with {mana_spent(u)} mana spent: {u}')
+        exit()
+
+    visited.add(u)
+    for v in neighbors(u):
+        if v not in visited:
+            dfs(v, target, visited)
+
+
+def neighbors(strategy):
+    game = make_game()
+    for spell in strategy:
+        game.player_turn(spell)
+        game.boss_turn()
+    return [
+        strategy + (spell,)
+        for spell in SPELLS
+        if SPELL_COSTS[spell] <= game.player.mana
+    ]
+
+
+def mana_spent(strategy):
+    # TODO I guess this is missing a case. You could win at the Effect Phase of
+    # a player turn, so the last spell isn't actually cast yet.
+    return sum(SPELL_COSTS[spell] for spell in strategy)
+
+
+WIN = 1
+LOSS = -1
+UNFINISHED = 0
+def evaluate_node(strategy):
+    game = make_game()
+    for spell in strategy:
+        game.player_turn(spell)
+        if game.is_game_over:
+            return WIN if game.is_win else LOSS
+        game.boss_turn()
+        if game.is_game_over:
+            return WIN if game.is_win else LOSS
+    return UNFINISHED
+
+
+def make_game():
+    return Game(
+        boss_hp = 55,
+        boss_damage = 8,
+        player_hp = 50,
+        player_mana = 500,
+    )
 
 
 class Game:
@@ -134,6 +144,7 @@ class Game:
         self.player = Fighter(player_hp, 0, 0, player_mana)
         self.active_effects = []
         self.is_game_over = False
+        self.is_win = False
         self.total_mana_spent = 0
 
 
@@ -259,13 +270,15 @@ class Game:
 
     def check_gameover(self):
         if self.player.hp <= 0:
-            print('The player dies.')
+            log('The player dies.')
             self.is_game_over = True
+            self.is_win = False
             raise GameOver()
         elif self.boss.hp <= 0:
-            print('The boss dies.')
+            log('The boss dies.')
             # print('The boss dies. ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅')
             self.is_game_over = True
+            self.is_win = True
             raise GameOver()
 
 
