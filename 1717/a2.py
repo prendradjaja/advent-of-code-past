@@ -1,6 +1,3 @@
-# a.py would have been too slow to build on for part 2: runtime was in O(INSERTIONS^2)
-# So re-solve with a linked list before moving on to part 2
-
 STEPS = 301
 INSERTIONS = 2017
 
