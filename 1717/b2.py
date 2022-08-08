@@ -10,7 +10,7 @@ INSERTIONS = 50000000
 
 class CircularBuffer:
     def __init__(self):
-        self.first_nonzero_item = None
+        self.second_item = None
         self.current_position = 0
         self.length = 1
 
@@ -21,7 +21,7 @@ class CircularBuffer:
         self.current_position += 1
         self.length += 1
         if self.current_position == 1:
-            self.first_nonzero_item = value
+            self.second_item = value
 
 
 class ListNode:
@@ -35,7 +35,7 @@ def main():
     for n in range(1, INSERTIONS + 1):
         buf.advance(STEPS)
         buf.insert(n)
-    print(buf.first_nonzero_item)
+    print(buf.second_item)
 
 
 if __name__ == '__main__':

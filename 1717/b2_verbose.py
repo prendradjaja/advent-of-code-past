@@ -7,7 +7,7 @@ INSERTIONS = 9
 
 class CircularBuffer:
     def __init__(self):
-        self.first_nonzero_item = None
+        self.second_item = None
         self.current_position = 0
         self.length = 1
 
@@ -18,7 +18,7 @@ class CircularBuffer:
         self.current_position += 1
         self.length += 1
         if self.current_position == 1:
-            self.first_nonzero_item = value
+            self.second_item = value
 
     def __str__(self):
         result = ''
@@ -26,7 +26,7 @@ class CircularBuffer:
             if n == 0:
                 value = str(0)
             elif n == 1:
-                value = str(self.first_nonzero_item)
+                value = str(self.second_item)
             else:
                 value = '?'
 
