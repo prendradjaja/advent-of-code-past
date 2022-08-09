@@ -1,21 +1,15 @@
-# list_size = 5
-# lengths = [3, 4, 1, 5]
-
-list_size = 256
-lengths = [183,0,31,146,254,240,223,150,2,206,161,1,255,232,199,88]
+LIST_SIZE = 256
+LENGTHS = [183,0,31,146,254,240,223,150,2,206,161,1,255,232,199,88]
 
 
 def main():
     current_position = 0
     skip_size = 0
-    items = list(range(list_size))
+    items = list(range(LIST_SIZE))
 
-    for length in lengths:
+    for length in LENGTHS:
         items = reverse(items, current_position, length)
-
-        current_position += length + skip_size
-        current_position %= list_size
-
+        current_position = (current_position + length + skip_size) % LIST_SIZE
         skip_size += 1
 
     answer = items[0] * items[1]
