@@ -164,7 +164,7 @@ class Game:
         self.is_game_over = False
         self.is_win = False
         self.total_mana_spent = 0
-        self.verbose = False
+        self.verbose = verbose
 
 
     def player_turn(self, spell):
