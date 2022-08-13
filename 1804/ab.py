@@ -7,7 +7,8 @@ from util import findint
 
 
 def main():
-    grid, letter_to_guard = make_grid()
+    input_file_path = sys.argv[1] if len(sys.argv) > 1 else 'in'
+    grid, letter_to_guard = make_grid(input_file_path)
 
     show_grid(grid, monochrome=True)
     show_grid(grid)
@@ -19,8 +20,8 @@ def main():
     print('Part 2 answer:', part_2_answer)
 
 
-def make_grid():
-    f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
+def make_grid(input_file_path):
+    f = open(input_file_path)
     lines = [l.rstrip('\n') for l in f]
     lines.sort()
     log = {}
