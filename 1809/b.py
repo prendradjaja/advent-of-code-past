@@ -8,7 +8,7 @@ def main():
     text = open(sys.argv[1] if len(sys.argv) > 1 else 'in').read()
     players, marbles = findints(text)
 
-    answer = play(players, marbles)
+    answer = play(players, marbles * 100)
     print(answer)
 
 
@@ -42,14 +42,25 @@ def play(players, marbles):
     return max(scores.values())
 
 
+class ListNode:
+    def __init__(self, value, next, prev):
+        self.value = value
+        self.next = next
+        self.prev = prev
+
+
 class CircularBuffer:
     def __init__(self):
-        self.items = [0]
-        self.current_index = 0
+        self.head = ListNode(0, None, None)
+        self.head.next = self.head
+        self.head.prev = self.head
+        self.current = self.head
 
     def insert(self, value):
         '''
         >>> buf = CircularBuffer()
+        >>> print(buf)
+        (0)
         >>> buf.insert(1)
         >>> print(buf)
         0 (1)
@@ -66,63 +77,52 @@ class CircularBuffer:
         >>> print(buf)
         0 4 2 (5) 1 3
         '''
-        index = (self.current_index + 1) % len(self.items)
-        insert_after(self.items, index, value)
-        self.current_index = index + 1
+        a = self.current.next
+        b = self.current.next.next
+
+        newnode = ListNode(value, b, a)
+        a.next = newnode
+        b.prev = newnode
+        self.current = newnode
 
     def remove(self):
         '''
         >>> buf = CircularBuffer()
-        >>> buf.items = [0, 16, 8, 17, 4, 18, 9, 19, 2, 20, 10, 21, 5, 22, 11, 1, 12, 6, 13, 3, 14, 7, 15]
-        >>> buf.current_index = 13
+        >>> for n in range(1, 23):
+        ...     buf.insert(n)
         >>> print(buf)
         0 16 8 17 4 18 9 19 2 20 10 21 5 (22) 11 1 12 6 13 3 14 7 15
+
         >>> buf.remove()
         9
         >>> print(buf)
         0 16 8 17 4 18 (19) 2 20 10 21 5 22 11 1 12 6 13 3 14 7 15
-
-        >>> buf = CircularBuffer()
-        >>> buf.items = [0, 1, 2, 3, 4, 5, 6, 7]
-        >>> buf.current_index = 6
-        >>> buf.remove()
-        7
-        >>> print(buf)
-        (0) 1 2 3 4 5 6
         '''
-        index = (self.current_index - 7) % len(self.items)
-        result = self.items.pop(index)
-        if index == len(self.items):
-            index = 0
-        assert 0 <= index < len(self.items)
-        self.current_index = index
+        node = self.current
+        for _ in range(7):
+            node = node.prev
+
+        result = node.value
+
+        a = node.prev
+        b = node.next
+        a.next = b
+        b.prev = a
+
+        self.current = b
+
+        assert self.head is not node, 'TODO implement me'
+
         return result
 
     def __str__(self):
-        result = ''
-        for i, n in enumerate(self.items):
-            if i == self.current_index:
-                result += f'({n}) '
-            else:
-                result += f'{n} '
+        itemstr = lambda node: f'{node.value} ' if node is not self.current else f'({node.value}) '
+        result = itemstr(self.head)
+        curr = self.head.next
+        while curr is not self.head:
+            result += itemstr(curr)
+            curr = curr.next
         return result.strip()
-
-
-def insert_after(lst, index, value):
-    '''
-    >>> xs = ['a', 'b', 'c', 'd']
-    >>> insert_after(xs, 0, 'A')
-    >>> xs
-    ['a', 'A', 'b', 'c', 'd']
-    >>> insert_after(xs, 2, 'B')
-    >>> xs
-    ['a', 'A', 'b', 'B', 'c', 'd']
-    >>> insert_after(xs, 5, 'Z')
-    >>> xs
-    ['a', 'A', 'b', 'B', 'c', 'd', 'Z']
-    '''
-    assert 0 <= index < len(lst)
-    lst[index+1 : index+1] = [value]
 
 
 if __name__ == '__main__':
