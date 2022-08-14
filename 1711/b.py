@@ -103,5 +103,14 @@ def distance_from_origin(position):
         return distance_from_southeast_axis + distance_from_origin( (r, c) )
 
 
+# Alternatively, a concise solution adapted from <https://www.redblobgames.com/grids/hexagons/#distances-doubled>
+
+# def distance_from_origin(position):
+#     r, c = position
+#     r = abs(r)
+#     c = abs(c)
+#     return c + max(0, (r - c) // 2)
+
+
 if __name__ == '__main__':
     main()
