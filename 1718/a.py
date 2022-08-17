@@ -10,7 +10,7 @@ def main():
         return value_or_register
 
     f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
-    lines = [l.rstrip('\n') for l in f]
+    lines = f.read().splitlines()
     program = [ints(line.split()) for line in lines]
 
     registers = { r: 0 for r in string.ascii_lowercase }
@@ -41,7 +41,7 @@ def main():
                 exit()
         elif op == 'jgz':
             x, y = args
-            if get(x):
+            if get(x) > 0:
                 ip += get(y)
                 continue
         else:
