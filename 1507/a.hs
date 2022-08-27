@@ -1,8 +1,5 @@
 -- Just for fun, a solution taking advantage of Haskell not caring what order
 -- you declare variables in (since they can never be reassigned).
---
--- I used Vim to edit the puzzle input and turn it into Haskell syntax. Doing
--- this for other puzzle inputs is an exercise left to the reader ;)
 
 import Data.Bits ((.&.), (.|.), shift)
 import qualified Data.Bits (complement)
