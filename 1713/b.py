@@ -21,6 +21,20 @@ Packet = Record('Packet', 'depth delay')
 
 
 def main():
+    '''
+    Remarks:
+
+    First (much too slow) approach was to simulate one packet moving through
+    the firewall. Eventually the packet hits a scanner -- at that point, stop
+    the simulation and start over. Repeat this for every possible delay value
+    (0, 1, 2, 3, ...).
+
+    This solution is just an optimization on top of that same idea: Instead of
+    simulating one packet then restarting the simulation at every collision
+    with a scanner, simulate a continuous stream of packets.
+
+    There must be a better way to do this, but hey -- it works :)
+    '''
     global input_lines
     input_path = sys.argv[1] if len(sys.argv) > 1 else 'in'
     verbose = '-v' in sys.argv
