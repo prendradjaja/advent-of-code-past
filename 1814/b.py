@@ -1,6 +1,3 @@
-# There must be a better way! I let this run for 18 minutes (`items` had length
-# 1.4 billion) and still didn't find the answer...
-
 import sys
 
 
@@ -36,11 +33,11 @@ def play(target_subarray):
         p1 = (p1 + 1 + items[p1]) % len(items)
         p2 = (p2 + 1 + items[p2]) % len(items)
 
-        if items[-5:] == target_subarray:
-            return len(items) - 5
-        elif items[-6:-1] == target_subarray:
-            print('Warning: Answer is in case 2')
+        if items[-6:] == target_subarray:
             return len(items) - 6
+        elif items[-7:-1] == target_subarray:
+            print('Warning: Answer is in case 2')
+            return len(items) - 7
 
         # if len(items) % 1000000 == 0:
         #     print(f'... {len(items):,}')
