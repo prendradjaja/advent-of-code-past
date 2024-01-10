@@ -6,6 +6,11 @@ def main():
     f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
     rules, molecule = f.read().strip().split('\n\n')
     rules = parse_rules(rules)
+    # rules = e.g.
+    # {
+    #     'H': ['HO', 'OH'],
+    #     'O': ['HH']
+    # }
 
     generated = set()
     for left, rights in rules.items():
