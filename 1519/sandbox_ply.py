@@ -126,6 +126,7 @@ def p_error(p):
 # Build the parser
 parser = yacc()
 
-# Parse an expression
-ast = parser.parse('2 * 3 + 4 * (5 - x)')
-print(ast)
+if __name__ == '__main__':
+    # Parse an expression
+    ast = parser.parse('2 * 3 + 4 * (5 - x)')
+    print(ast)
