@@ -1,6 +1,8 @@
+analyze:
+	python3 analyze.py
 run:
-	./env/bin/python3 b.wip.py in
+	./env/bin/python3 b_wip.py in
 example:
-	./env/bin/python3 b.wip.py med
+	./env/bin/python3 b_wip.py med
 test:
-	./env/bin/python3 -m doctest b.wip.py
+	./env/bin/python3 -m doctest b_wip.py

@@ -1,7 +1,7 @@
 #!./env/bin/python3
 '''
 Usage example:
-    ./b.wip.py med
+    ./b_wip.py med
 '''
 
 import astar
