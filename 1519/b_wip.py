@@ -40,6 +40,23 @@ def main():
     print(len(path) - 1)
 
 
+# def similarity(curr_node, goal_node):
+#     '''
+#     >>> similarity([1, 0, 2, 3], [1, 2, 3])
+#     3
+#     >>> similarity([1, 0, 3, 2], [1, 2, 3])
+#     2
+#     '''
+#     to_match = list(goal_node)
+#     for each in curr_node:
+#         if each == to_match[0]:
+#             to_match.pop(0)
+#             if not to_match:
+#                 break
+#     return len(goal_node) - len(to_match)
+
+
+
 def neighbors(rules, node):
     visited.add(node)
     molecule = node
@@ -56,6 +73,7 @@ def heuristic(inert_elements, curr_node, goal_node):
         if curr_counts[each] > goal_counts[each]:
             return float('inf')
     return 1
+    # return 1 - similarity(curr_node, goal_node) / 1000
 
 
 def get_next_generation(curr_generation, rules):
