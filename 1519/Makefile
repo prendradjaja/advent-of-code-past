@@ -1,3 +1,7 @@
+generate_grammar:
+	python3 generate_grammar.py ex > foo.py
+diff:
+	make generate_grammar && git diff --no-index foo.py sandbox_ply.py
 analyze:
 	python3 analyze.py
 run:
