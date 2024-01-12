@@ -37,6 +37,8 @@ def analyze(rules, verbose=False):
         print('They are:')
         print(*sorted(inert_elements))
 
+    # TODO check no element is called E
+
     return inert_elements
 
 
