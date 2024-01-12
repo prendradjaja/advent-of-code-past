@@ -1,0 +1,314 @@
+>>> from a import World, Position
+
+--------------------------------------------------------------------------------
+get_distances() tests
+
+>>> world = World('''
+... #######
+... #E..G.#
+... #...#.#
+... #.G.#G#
+... #######
+... '''.strip())
+
+>>> distances = world.get_distances(Position(1, 1))
+>>> distances == {
+...     Position(1, 1): 0,
+...     Position(1, 2): 1,
+...     Position(1, 3): 2,
+...     Position(2, 1): 1,
+...     Position(2, 2): 2,
+...     Position(2, 3): 3,
+...     Position(3, 1): 2,
+...     Position(3, 3): 4,
+... }
+True
+
+>>> del world
+
+--------------------------------------------------------------------------------
+choose_destination() tests
+
+>>> world = World('''
+... #######
+... #E..G.#
+... #...#.#
+... #.G.#G#
+... #######
+... '''.strip())
+
+Test case: Intermediate results
+>>> results = world.choose_destination(Position(1, 1), _return_intermediate_results=True)
+>>> results['in-range'] == {
+...     Position(1, 3),
+...     Position(1, 5),
+...     Position(2, 2),
+...     Position(2, 5),
+...     Position(3, 1),
+...     Position(3, 3),
+... }
+True
+>>> results['reachable'] == {
+...     Position(1, 3),
+...     Position(2, 2),
+...     Position(3, 1),
+...     Position(3, 3),
+... }
+True
+
+Test case: Final result
+>>> destination = world.choose_destination(Position(1, 1))
+>>> destination
+Position(r=1, c=3)
+
+Test case: "No destination"
+>>> World('''
+... #######
+... #E....#
+... #...#.#
+... #...#.#
+... #######
+... '''.strip()).choose_destination(Position(1, 1)) is None
+True
+
+Test case: Another "has destination" case, this time with teammates
+>>> World('''
+... ##############
+... #E.E.........#
+... #.......E....#
+... #.G..........#
+... #............#
+... #.........G..#
+... #....E.......#
+... #............#
+... ##############
+... '''.strip()).choose_destination(Position(1, 1))
+Position(r=2, c=2)
+
+Test case: Another "no destination" case, this time with teammates
+>>> World('''
+... ##############
+... #E...........#
+... #..E.........#
+... #.EGE........#
+... #..E........E#
+... #..........EG#
+... #...........E#
+... #............#
+... ##############
+... '''.strip()).choose_destination(Position(1, 1)) is None
+True
+
+>>> del world
+
+--------------------------------------------------------------------------------
+Movement tests, i.e. take_turn(_move_only=True)
+
+Test case: Move once
+>>> world = World('''
+... #######
+... #.E...#
+... #.....#
+... #...G.#
+... #######
+... '''.strip())
+>>> world.take_turn(Position(1, 2), _move_only=True)
+>>> world.show()
+#######
+#..E..#
+#.....#
+#...G.#
+#######
+<BLANKLINE>
+
+Test case: Move several times (with several units)
+The final frame of this test case is repeated to demonstrate that "Once the
+Goblins and Elf reach the positions above, they all are either in range of a
+target or cannot find any square in range of a target, and so none of the units
+can move until a unit dies." (From the spec. This example is from the spec.)
+>>> world = World('''
+... #########
+... #G..G..G#
+... #.......#
+... #.......#
+... #G..E..G#
+... #.......#
+... #.......#
+... #G..G..G#
+... #########
+... '''.strip())
+>>> for pos in sorted(world.units):
+...     world.take_turn(pos, _move_only=True)
+>>> world.show()
+#########
+#.G...G.#
+#...G...#
+#...E..G#
+#.G.....#
+#.......#
+#G..G..G#
+#.......#
+#########
+<BLANKLINE>
+>>> for pos in sorted(world.units):
+...     world.take_turn(pos, _move_only=True) and None
+>>> world.show()
+#########
+#..G.G..#
+#...G...#
+#.G.E.G.#
+#.......#
+#G..G..G#
+#.......#
+#.......#
+#########
+<BLANKLINE>
+>>> for pos in sorted(world.units):
+...     world.take_turn(pos, _move_only=True) and None
+>>> world.show()
+#########
+#.......#
+#..GGG..#
+#..GEG..#
+#G..G...#
+#......G#
+#.......#
+#.......#
+#########
+<BLANKLINE>
+>>> for pos in sorted(world.units):
+...     world.take_turn(pos, _move_only=True) and None
+>>> world.show()
+#########
+#.......#
+#..GGG..#
+#..GEG..#
+#G..G...#
+#......G#
+#.......#
+#.......#
+#########
+<BLANKLINE>
+
+--------------------------------------------------------------------------------
+simulate_round() tests
+
+>>> world = World('''
+... #######
+... #.G...#
+... #...EG#
+... #.#.#G#
+... #..G#E#
+... #.....#
+... #######
+... '''.strip())
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#..G..#   G(200)
+#...EG#   E(197), G(197)
+#.#G#G#   G(200), G(197)
+#...#E#   E(197)
+#.....#   
+#######   
+<BLANKLINE>
+
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#...G.#   G(200)
+#..GEG#   G(200), E(188), G(194)
+#.#.#G#   G(194)
+#...#E#   E(194)
+#.....#   
+#######   
+<BLANKLINE>
+
+>>> for _ in range(21):
+...     world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#...G.#   G(200)
+#..G.G#   G(200), G(131)
+#.#.#G#   G(131)
+#...#E#   E(131)
+#.....#   
+#######   
+<BLANKLINE>
+
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#..G..#   G(200)
+#...G.#   G(131)
+#.#G#G#   G(200), G(128)
+#...#E#   E(128)
+#.....#   
+#######   
+<BLANKLINE>
+
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#.G...#   G(200)
+#..G..#   G(131)
+#.#.#G#   G(125)
+#..G#E#   G(200), E(125)
+#.....#   
+#######   
+<BLANKLINE>
+
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#G....#   G(200)
+#.G...#   G(131)
+#.#.#G#   G(122)
+#...#E#   E(122)
+#..G..#   G(200)
+#######   
+<BLANKLINE>
+
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#G....#   G(200)
+#.G...#   G(131)
+#.#.#G#   G(119)
+#...#E#   E(119)
+#...G.#   G(200)
+#######   
+<BLANKLINE>
+
+>>> world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#G....#   G(200)
+#.G...#   G(131)
+#.#.#G#   G(116)
+#...#E#   E(113)
+#....G#   G(200)
+#######   
+<BLANKLINE>
+
+>>> for _ in range(19):
+...     world.simulate_round()
+>>> world.show(with_hit_points=True)
+#######   
+#G....#   G(200)
+#.G...#   G(131)
+#.#.#G#   G(59)
+#...#.#   
+#....G#   G(200)
+#######   
+<BLANKLINE>
+
+>>> world.completed_rounds
+47
+
+>>> world.simulate_round()
+'COMBAT_END'
+
+>>> world.completed_rounds
+47
+
