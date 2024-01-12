@@ -1,0 +1,27 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.0/brython.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12.0/brython_stdlib.js"></script>
+  <style>
+    .box {
+      position: absolute;
+    }
+    .box.clay {
+      background: black;
+    }
+    .box.spring {
+      background: red;
+    }
+    .box.flowing-water {
+      background: blue;
+    }
+    .box.resting-water {
+      background: lightblue;
+    }
+  </style>
+</head>
+<body onload="brython()">
+  <script type="text/python" src="./visualization.py"></script>
+</body>
+</html>
