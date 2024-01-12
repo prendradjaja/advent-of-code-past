@@ -1,9 +1,19 @@
 '''
 Usage:
+    python3 generate_grammar.py INPUT_FILE | python3
+    python3 generate_grammar.py ex2 | python3
+    # Unfortunately, it doesn't work with ex3 -- not sure why.
 
-    python3 generate_grammar.py input.txt > parser.py
-    python3 parser.py
-    # And then count the number of z's in the output -- that's the answer
+Explanation:
+
+The input is a grammar! I use PLY to create a parser for that grammar. This is
+somewhat clumsy and involved because PLY is a lot more verbose than e.g. yacc
+-- so probably it'll be easier to use a different parser generator -- but I've
+used PLY a bit before, so here we are.
+
+I wasn't sure if the particular parsing algorithm (PLY uses LALR(1)) would
+necessarily give the parse corresponding to the "fewest number of
+replacements" that the problem description asks for, but this seems to work.
 '''
 
 import sys
@@ -109,7 +119,7 @@ def p_{group_name.lower()}0(p):
         # print(right, i)
         assert left == group_name
         right_str = ' '.join(each.lower() for each in right)
-        parse_result = "('z'"
+        parse_result = "('#'"
         for j, each in enumerate(right, start=1):
             parse_result += f', p[{j}]'
         parse_result += ')'
@@ -145,5 +155,5 @@ if __name__ == '__main__':
 
     # Parse an expression
     ast = parser.parse({repr(molecule)})
-    print(ast)
+    print(str(ast).count('#'))
 ''')

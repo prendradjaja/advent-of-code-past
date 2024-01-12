@@ -1,3 +1,9 @@
+'''
+Usage:
+    python3 a.py INPUT_FILE
+    python3 a.py ex1
+'''
+
 import sys
 import collections
 
