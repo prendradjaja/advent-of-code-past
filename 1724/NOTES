@@ -1,0 +1,4 @@
+a.py: 15min
+s.py: 30min
+
+s.py can probably be done one-pass in 15min
