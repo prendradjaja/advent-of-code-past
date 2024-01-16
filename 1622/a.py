@@ -1,57 +1,36 @@
-# import fileinput, collections, collections as cl, itertools, itertools as it, math, random, sys, re, string, functools
-# from gridlib import gridsource as gridlib, gridcustom # *, gridsource, gridcardinal, gridplane
-# from util import *
-# from math import inf
+#!/usr/bin/env python3
+'''
+Usage:
+    ./a.py PATH_TO_INPUT_FILE
+'''
 
-import itertools
-import collections
 import sys
-from gridlib import gridsource as gridlib
-from util import findints
-from math import inf
+import re
+from collections import namedtuple
+import itertools
 
 
-Node = collections.namedtuple('Node', 'x y size used avail pctused')
+Node = namedtuple('Node', 'size used avail')
 
 
 def main():
-    f = open(sys.argv[1] if len(sys.argv) > 1 else 'in')
-    lines = [l.rstrip('\n') for l in f]
     nodes = {}
-    xmin = 0
-    ymin = 0
-    xmax = -inf
-    ymax = -inf
-    for line in lines:
-        if '/dev' not in line:
+    for line in open(sys.argv[1]).read().splitlines():
+        if not line.startswith('/dev'):
             continue
-        node = Node(*findints(line.replace('-', ' ')))
-        nodes[pos(node)] = node
-        xmax = max(xmax, node.x)
-        ymax = max(ymax, node.y)
+        x, y, size, used, avail, _ = [
+            int(n)
+            for n in
+            re.findall(r'\d+', line)
+        ]
+        nodes[(x, y)] = Node(size, used, avail)
 
-    # def neighbors(node):
-    #     for offset in gridlib.directions:
-    #         npos = gridlib.addvec(pos(node), offset)
-    #         if (
-    #             xmin <= npos.x <= xmax and
-    #             ymin <= npos.y <= ymax
-    #         ):
-    #             yield nodes[npos]
-
-    answer = 0
-    for a, b in itertools.product(nodes.values(), repeat=2):
-        if (
-            a != b
-            and a.used != 0
-            and a.used <= b.avail
-        ):
-            answer += 1
+    answer = sum(
+        1
+        for a, b in itertools.permutations(nodes.values(), 2)
+        if a.used != 0 and a.used <= b.avail
+    )
     print(answer)
-
-
-def pos(node):
-    return (node.x, node.y)
 
 
 if __name__ == '__main__':
