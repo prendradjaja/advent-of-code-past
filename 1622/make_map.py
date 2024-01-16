@@ -41,7 +41,9 @@ def main():
     for y in range(ymin, ymax+1):
         for x in range(xmin, xmax+1):
             node = nodes[x, y]
-            if node.used == 0:
+            if (x, y) == (xmax, 0):
+                ch = 'G'
+            elif node.used == 0:
                 ch = '_'
             elif node.size < cutoff:
                 ch = '.'
