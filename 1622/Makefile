@@ -11,14 +11,14 @@
 SHELL=/bin/bash
 
 run:
-	@python3 s.py
+	@python3 b2_wip.py in.map.txt
 
 test:
 	clear
-	python3 -m doctest s.py
+	python3 -m doctest b2_wip.py
 
 copy-last:
-	python3 s.py | tee >(tail -n1 | pbcopy)
+	python3 b2_wip.py | tee >(tail -n1 | pbcopy)
 
 example:
-	@python3 s.py ex
+	@python3 b2_wip.py ex.map.txt
