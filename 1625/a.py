@@ -1,20 +1,31 @@
 import sys
+import itertools
 from util import ints
 
 
+SAMPLE_SIZE = 10
+
+
 def main():
-    f = open('./day12input.txt')
+    f = open('./in')
     lines = [l.rstrip('\n') for l in f]
     program = [ints(line.split()) for line in lines]
 
-    registers = {'a': 0, 'b': 0, 'c': 1, 'd': 0}
-    run(program, registers)
-    print(registers)
+    expected = [0, 1] * (SAMPLE_SIZE // 2)
+    for a_value in itertools.count(1):
+        registers = {'a': a_value, 'b': 0, 'c': 0, 'd': 0}
+        output_values = run(program, registers)
+        if expected == list(itertools.islice(output_values, SAMPLE_SIZE)):
+            break
+
+    print(a_value)
 
 
 def run(program, registers):
     '''
-    Run PROGRAM, mutating REGISTERS. Returns REGISTERS.
+    Run PROGRAM, mutating REGISTERS.
+
+    Yields values from "out" instructions.
     '''
     ip = 0
     while ip < len(program):
@@ -43,12 +54,16 @@ def run(program, registers):
                 isjump = cond != 0
             if isjump:
                 offset = jumpoffset
+        elif op == 'out':
+            [arg] = args
+            if isinstance(arg, str):
+                yield registers[arg]
+            else:
+                yield arg
         else:
             1/0
 
         ip += offset
-
-    return registers
 
 
 if __name__ == '__main__':
