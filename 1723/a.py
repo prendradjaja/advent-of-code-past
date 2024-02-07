@@ -12,10 +12,9 @@ def main():
     lines = [l.rstrip('\n') for l in f]
     program = [ints(line.split()) for line in lines]
 
-    registers = { r: 0 for r in 'abcdefgh' }
-    registers['a'] = 1
-    time = 0
-    ip = 0
+    registers = dict(zip('abcdefgh', [1, 108400, 125400, 2, 2, 1, 0, 0]))
+    time = 10
+    ip = 11
     print('time ip op x y a b c d e f g h'.replace(' ', '\t'))
     print(time, '', '', '', '', *registers.values(), sep='\t')
     while 0 <= ip < len(program):
