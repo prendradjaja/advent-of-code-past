@@ -13,9 +13,15 @@ def main():
     program = [ints(line.split()) for line in lines]
 
     registers = { r: 0 for r in 'abcdefgh' }
+    registers['a'] = 1
+    time = 0
     ip = 0
     multiplications = 0
+    print('time ip op x y a b c d e f g h'.replace(' ', '\t'))
+    print(time, '', '', '', '', *registers.values(), sep='\t')
     while 0 <= ip < len(program):
+        next_ip = ip + 1
+        time += 1
         instruction = program[ip]
         op, x, y = instruction
         if op == 'set':
@@ -27,11 +33,13 @@ def main():
             multiplications += 1
         elif op == 'jnz':
             if get(x) != 0:
-                ip += get(y)
-                continue
+                next_ip = ip + get(y)
         else:
             1/0
-        ip += 1
+
+        print(time, ip, op, x, y, *registers.values(), sep='\t')
+
+        ip = next_ip
 
     print(multiplications)
 
