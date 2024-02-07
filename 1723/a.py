@@ -16,7 +16,6 @@ def main():
     registers['a'] = 1
     time = 0
     ip = 0
-    multiplications = 0
     print('time ip op x y a b c d e f g h'.replace(' ', '\t'))
     print(time, '', '', '', '', *registers.values(), sep='\t')
     while 0 <= ip < len(program):
@@ -30,7 +29,6 @@ def main():
             registers[x] -= get(y)
         elif op == 'mul':
             registers[x] *= get(y)
-            multiplications += 1
         elif op == 'jnz':
             if get(x) != 0:
                 next_ip = ip + get(y)
@@ -40,8 +38,6 @@ def main():
         print(time, ip, op, x, y, *registers.values(), sep='\t')
 
         ip = next_ip
-
-    print(multiplications)
 
 
 if __name__ == '__main__':
