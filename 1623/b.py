@@ -38,7 +38,6 @@ def run(instructions, registers):
 
     Run the program (instructions) on the given registers.
     '''
-    n = 0
     ip = 0
     while ip < len(instructions):
         assert ip >= 0
