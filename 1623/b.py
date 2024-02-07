@@ -1,11 +1,35 @@
+'''
+The problem description hints somewhat strongly towards the approach I used:
+
+- Inspect the program given. See generate_log.py -- I used a similar program,
+  though not exactly that one. I pasted the output into a spreadsheet, where
+  the "group rows" in Google Sheets was helpful.
+- Spreadsheet: https://docs.google.com/spreadsheets/d/1BoxtN_X2O55B4LNOyumQqQsR4QCl7ifPoU18e-ZjOaM/edit#gid=0
+
+- The key observation was noticing an addition loop early in the program (and
+  that loop is itself inside a multiplication loop).
+- In my input, the multiplication loop is lines 5-10. It is equivalent to this
+  pseudocode: "reg_a = reg_b * reg_c; reg_c = 0; reg_d = 0"
+- One other important observation was that the "tgl" instruction was only used
+  a few times, suggesting that it might not be something we need to worry
+  about. (In fact, the first toggle happens after the multiplication loop, so
+  we indeed don't need to worry about it.)
+
+- Having found this loop, we simply extend the capabilities of the assembunny
+  language to add a multiplication instruction and edit the program accodingly
+  (compare the file "in" to "in-optimized"), and it will run to completion
+  much more quickly.
+'''
+
 from util import ints
 
 
 def main():
-    instructions = [ints(l.rstrip('\n').split()) for l in open('in')]
-    registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
+    instructions = [ints(l.rstrip('\n').split()) for l in open('in-optimized')]
+    registers = {'a': 12, 'b': 0, 'c': 0, 'd': 0}
     run(instructions, registers)
     print(registers['a'])
+
 
 
 def run(instructions, registers):
@@ -30,10 +54,18 @@ def run(instructions, registers):
                 else:
                     assert_is_register_name(dst)
                     registers[dst] = src
+            elif op == 'noop':
+                pass
             elif op == 'inc':
                 dst = args[0]
                 assert_is_register_name(dst)
                 registers[dst] += 1
+            elif op == 'mul':
+                src1, src2, dst = args
+                assert_is_register_name(src1)
+                assert_is_register_name(src2)
+                assert_is_register_name(dst)
+                registers[dst] += registers[src1] * registers[src2]
             elif op == 'dec':
                 dst = args[0]
                 assert_is_register_name(dst)

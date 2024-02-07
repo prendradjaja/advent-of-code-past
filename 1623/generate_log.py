@@ -1,39 +1,11 @@
-# import fileinput, collections, collections as cl, itertools, itertools as it, math, random, sys, re, string, functools
-# from gridlib import gridsource as gridlib, gridcustom # *, gridsource, gridcardinal, gridplane
-# from util import *
-
-import sys
 from util import ints
 
 
 def main():
-
-    # # Slow-ish: Takes ~0.5 seconds
-    # instructions = [ints(l.rstrip('\n').split()) for l in open('day12input.txt')]
-    # registers = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
-    # run(instructions, registers)
-    # print('Day 12 part 1:', registers['a'])
-    # assert registers['a'] == 318007
-
-    # # Slow: Takes ~10 seconds
-    # instructions = [ints(l.rstrip('\n').split()) for l in open('day12input.txt')]
-    # registers = {'a': 0, 'b': 0, 'c': 1, 'd': 0}
-    # run(instructions, registers)
-    # print('Day 12 part 2:', registers['a'])
-    # assert registers['a'] == 9227661
-
-    instructions = [ints(l.rstrip('\n').split()) for l in open('ex')]
-    registers = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
-    run(instructions, registers)
-    print('Example:      ', registers['a'])
-    assert registers['a'] == 3
-
     instructions = [ints(l.rstrip('\n').split()) for l in open('in')]
     registers = {'a': 7, 'b': 0, 'c': 0, 'd': 0}
     run(instructions, registers)
     print('Part 1:       ', registers['a'])
-    assert registers['a'] == 13776
-
 
 
 def run(instructions, registers):
@@ -42,9 +14,13 @@ def run(instructions, registers):
 
     Run the program (instructions) on the given registers.
     '''
-    n = 0
+    time = 0
     ip = 0
+    print('time ip op args a b c d'.replace(' ', '\t'))
+    print(time, '', '', '', *registers.values(), sep='\t')
     while ip < len(instructions):
+        time += 1
+        toggle_description = ''
         assert ip >= 0
 
         op, *args = instructions[ip]
@@ -86,9 +62,11 @@ def run(instructions, registers):
                     instruction_to_toggle = instructions[idx]
                     skip = False
                 except IndexError:
+                    toggle_description = 'toggle skipped: attempted to toggle an insturction outside the program'
                     skip = True
                 if not skip:
                     old_op = instruction_to_toggle[0]
+                    old_instruction = instruction_to_toggle[:]
                     new_op = {
                         # For one-argument instructions, inc becomes dec, and all other one-argument instructions become inc.
                         'inc': 'dec',
@@ -100,16 +78,14 @@ def run(instructions, registers):
                         'cpy': 'jnz',
                     }[old_op]
                     instruction_to_toggle[0] = new_op
+                    toggle_description = f'toggle: at address {idx}, {to_str(old_instruction)} became {to_str(instruction_to_toggle)}'
             else:
                 1/0
         except (NotARegisterException, NotANumberException) as e:
             print('Warning: Invalid instruction', instructions[ip])
             pass  # Invalid instructions are to be skipped
 
-        # print(registers['a'], registers['b'], registers['c'], registers['d'])
-        # for i, each in enumerate(instructions):
-        #     print('-' if i == ip else ' ', each)
-        # print()
+        print(time, ip, op, ' '.join(str(each) for each in args), *registers.values(), toggle_description, sep='\t')
 
         ip += offset
 
@@ -120,6 +96,10 @@ class NotARegisterException(Exception):
 
 class NotANumberException(Exception):
     pass
+
+
+def to_str(instruction):
+    return ' '.join(str(x) for x in instruction)
 
 
 def assert_is_register_name(dst):
