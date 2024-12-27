@@ -22,8 +22,20 @@ def main():
 
     graph = Graph()
     traverse(tree, graph, {(0, 0)})
-    answer = max(graph.distances((0, 0)).values())
-    print(answer)
+
+    answer1 = max(graph.distances((0, 0)).values())
+    print('Part 1 answer:')
+    print(answer1)
+
+    distances = graph.distances((0, 0))
+    answer2 = sum(
+        1
+        for node, distance
+        in distances.items()
+        if distance >= 1000
+    )
+    print('Part 2 answer:')
+    print(answer2)
 
 
 class Graph:
