@@ -4,3 +4,10 @@ __pycache__/
 tmp/
 
 in
+
+# Executables
+a
+b
+s
+
+Makefile
